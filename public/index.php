@@ -1,9 +1,9 @@
 <?php
 session_start();
 
-require_once __DIR__ . '/../components/db.php';
-require_once __DIR__ . '/../models/User.php';
-require_once __DIR__ . '/../controllers/SiteController.php';
+require __DIR__ . '/../components/db.php';
+require __DIR__ . '/../models/User.php';
+require __DIR__ . '/../controllers/SiteController.php';
 
 function setFlash($id, $value)
 {
@@ -31,3 +31,5 @@ if (!isset($_SESSION['user'])) {
 }
 
 $c = new SiteController($action);
+
+echo $c->getContent();

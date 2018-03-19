@@ -1,6 +1,6 @@
 <?= flash('error') ?>
 
-<?= $balance ?>
+Всего денег: <?= $user->cash ?>
 
 <form action="?action=cash" method="get">
     <label for="count">Сколько вывести</label>

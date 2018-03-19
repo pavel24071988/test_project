@@ -4,19 +4,46 @@ class SiteController
 {
     protected $dbh;
     protected $viewsPath = __DIR__ . '/../views';
+    protected $content;
 
     public function __construct($action)
     {
         if (method_exists($this, $action)) {
-            return $this->{$action}();
-        } 
-
-        return $this->error404();
+            $this->content = $this->{$action}();
+        } else {
+            $this->content = $this->error404();
+        }
     }
 
-    public function requireView($view) 
+    public function getContent()
     {
-        require_once $this->viewsPath . '/' . $view . '.php';
+        return $this->content;
+    }
+
+    public function requireView($view, $params = []) 
+    {
+        $_obInitialLevel_ = ob_get_level();
+        ob_start();
+        ob_implicit_flush(false);
+        extract($params, EXTR_OVERWRITE);
+        try {
+            require $this->viewsPath . '/' . $view . '.php';
+            return ob_get_clean();
+        } catch (\Exception $e) {
+            while (ob_get_level() > $_obInitialLevel_) {
+                if (!@ob_end_clean()) {
+                    ob_clean();
+                }
+            }
+            throw $e;
+        } catch (\Throwable $e) {
+            while (ob_get_level() > $_obInitialLevel_) {
+                if (!@ob_end_clean()) {
+                    ob_clean();
+                }
+            }
+            throw $e;
+        }
     }
 
     public function auth() 
@@ -32,7 +59,7 @@ class SiteController
             }
         }
 
-        $this->requireView('auth');
+        return $this->requireView('auth');
     }
 
     public function cash() 
@@ -48,12 +75,12 @@ class SiteController
             }
         }
 
-        $this->requireView('cash');
+        return $this->requireView('cash', ['user' => $user]);
     }
 
     public function error404()
     {
-        $this->requireView('error404');
+        return $this->requireView('error404');
     }
 
 }

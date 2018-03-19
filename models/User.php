@@ -21,9 +21,8 @@ class User
 
     public static function findBy($attr, $value)
     {
-        $tableName = static::$tableName;
         $dbh = static::getConnection();
-        $sth = $dbh->prepare("SELECT * FROM users WHERE {$attr} = ?");
+        $sth = $dbh->prepare('SELECT * FROM ' . static::$tableName . ' WHERE ' . $attr . ' = ?');
         $sth->execute([$value]);
         $result = $sth->fetchAll();
 
@@ -46,8 +45,8 @@ class User
 
         $this->dbh->beginTransaction();
 
-        $sth = $this->dbh->prepare("UPDATE users
-            SET cash = cash - ?");
+        $sth = $this->dbh->prepare('UPDATE ' . self::$tableName . '
+            SET cash = cash - ?');
         $sth->execute([$count]);
 
         $this->dbh->commit();
