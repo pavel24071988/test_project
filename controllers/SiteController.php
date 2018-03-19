@@ -51,7 +51,7 @@ class SiteController
         if (isset($_POST['password'], $_POST['email'])) {
             $user = User::findBy('email', $_POST['email']);
             if (password_verify($_POST['password'], $user->password_hash)) {
-                $_SESSION['user'] = $user->id;
+                setSessionVar('user', $user->id);
                 return $this->cash();
 
             } else {
