@@ -1,3 +1,5 @@
+<?= flash('error') ?>
+
 <?= $balance ?>
 
 <form action="?action=cash" method="get">
