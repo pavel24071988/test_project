@@ -9,6 +9,10 @@ class User
     public $password_hash;
     public $cash;
 
+    protected static $fields = [
+        'id', 'email', 'password_hash', 'cash'
+    ];
+
     public function __construct()
     {
         $this->dbh = static::getConnection();
@@ -28,7 +32,7 @@ class User
 
         if (count($result) > 0) {
             $model = new static();
-            foreach (['id', 'email', 'password_hash', 'cash'] as $field) {
+            foreach (static::$fields as $field) {
                 $model->{$field} = $result[0][$field];
             }
             return $model;
@@ -37,8 +41,22 @@ class User
         return null;
     }
 
+    protected function update()
+    {
+        $model = static::findBy('id', $this->id);
+        foreach (static::$fields as $field) {
+            $this->{$field} = $model->{$field};
+        }
+    }
+
     public function withdraw($count)
     {
+        if (!filter_var($count, FILTER_VALIDATE_INT, ['options' => [
+            'min_range' => 0
+        ]])) {
+            throw new Exception('Количество выводимых денег должно быть положительным числом!');
+        }
+
         if ($this->cash - $count < 0) {
             throw new Exception('У вас не хватает денег!');
         }
@@ -48,8 +66,10 @@ class User
         $sth = $this->dbh->prepare('UPDATE ' . self::$tableName . '
             SET cash = cash - ?');
         $sth->execute([$count]);
-
+        
         $this->dbh->commit();
+
+        $this->update();
 
         return true;
     }

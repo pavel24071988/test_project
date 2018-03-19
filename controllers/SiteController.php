@@ -66,11 +66,10 @@ class SiteController
     {
         $user = User::findBy('id', $_SESSION['user']);
 
-        if (isset($_POST['cash']) && is_integer($_POST['cash'])) {
+        if (isset($_POST['count'])) {
             try {
-                $user->withdraw($_POST['cash']);
+                $user->withdraw($_POST['count']);
             } catch (Exception $e) {
-                var_dump($e);
                 setFlash('error', $e->getMessage());
             }
         }
